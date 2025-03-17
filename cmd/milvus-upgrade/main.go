@@ -42,11 +42,13 @@ func upgradeCmd() *cobra.Command {
 			}
 		},
 	}
-	cmd.Flags().StringVar(&instance, "instance", "", "Milvus instance name (required)")
-	cmd.Flags().StringVar(&namespace, "namespace", "default", "Kubernetes namespace")
-	cmd.Flags().StringVar(&targetVersion, "target-version", "", "Target Milvus version (required)")
-	cmd.Flags().BoolVar(&force, "force", false, "Force upgrade without confirmation")
-	cmd.Flags().BoolVar(&skipChecks, "skip-checks", false, "Skip pre-upgrade checks")
+
+	cmd.Flags().StringVarP(&instance, "instance", "i", "", "Milvus instance name (required)")
+	cmd.Flags().StringVarP(&namespace, "namespace", "n", "default", "Kubernetes namespace")
+	cmd.Flags().StringVarP(&targetVersion, "target-version", "t", "", "Target Milvus version (required)")
+	cmd.Flags().BoolVarP(&force, "force", "f", false, "Force upgrade without confirmation")
+	cmd.Flags().BoolVarP(&skipChecks, "skip-checks", "s", false, "Skip pre-upgrade checks")
+
 	cmd.MarkFlagRequired("instance")
 	cmd.MarkFlagRequired("target-version")
 	return cmd
@@ -63,11 +65,13 @@ func downgradeCmd() *cobra.Command {
 			}
 		},
 	}
-	cmd.Flags().StringVar(&instance, "instance", "", "Milvus instance name (required)")
-	cmd.Flags().StringVar(&namespace, "namespace", "default", "Kubernetes namespace")
-	cmd.Flags().StringVar(&targetVersion, "target-version", "", "Target Milvus version (required)")
-	cmd.Flags().BoolVar(&force, "force", false, "Force downgrade without confirmation")
-	cmd.Flags().BoolVar(&skipChecks, "skip-checks", false, "Skip pre-downgrade checks")
+
+	cmd.Flags().StringVarP(&instance, "instance", "i", "", "Milvus instance name (required)")
+	cmd.Flags().StringVarP(&namespace, "namespace", "n", "default", "Kubernetes namespace")
+	cmd.Flags().StringVarP(&targetVersion, "target-version", "t", "", "Target Milvus version (required)")
+	cmd.Flags().BoolVarP(&force, "force", "f", false, "Force downgrade without confirmation")
+	cmd.Flags().BoolVarP(&skipChecks, "skip-checks", "s", false, "Skip pre-downgrade checks")
+
 	cmd.MarkFlagRequired("instance")
 	cmd.MarkFlagRequired("target-version")
 	return cmd
@@ -84,9 +88,11 @@ func rollbackCmd() *cobra.Command {
 			}
 		},
 	}
-	cmd.Flags().StringVar(&instance, "instance", "", "Milvus instance name (required)")
-	cmd.Flags().StringVar(&namespace, "namespace", "default", "Kubernetes namespace")
-	cmd.Flags().BoolVar(&force, "force", false, "Force rollback without confirmation")
+
+	cmd.Flags().StringVarP(&instance, "instance", "i", "", "Milvus instance name (required)")
+	cmd.Flags().StringVarP(&namespace, "namespace", "n", "default", "Kubernetes namespace")
+	cmd.Flags().BoolVarP(&force, "force", "f", false, "Force rollback without confirmation")
+
 	cmd.MarkFlagRequired("instance")
 	return cmd
 }
