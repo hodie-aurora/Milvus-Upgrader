@@ -6,8 +6,8 @@ import (
 	"github.com/hodie-aurora/milvus-upgrader/pkg/k8s"
 )
 
-// MajorUpgrade 执行大版本升级
+// MajorUpgrade performs a major version upgrade
 func MajorUpgrade(client *k8s.ClientSet, instance, namespace, targetVersion string) error {
-	fmt.Printf("大版本升级到 %s 暂未实现。\n", targetVersion)
-	return fmt.Errorf("大版本升级暂不支持")
+	fmt.Printf("Major version upgrade to %s not yet implemented.\n", targetVersion)
+	return fmt.Errorf("Major version upgrade not yet supported")
 }

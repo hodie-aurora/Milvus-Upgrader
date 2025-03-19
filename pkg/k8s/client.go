@@ -10,13 +10,13 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 )
 
-// ClientSet 包含 Kubernetes 客户端和动态客户端
+// ClientSet contains Kubernetes client and dynamic client
 type ClientSet struct {
 	KubernetesClient *kubernetes.Clientset
 	DynamicClient    dynamic.Interface
 }
 
-// GetClient 初始化并返回 Kubernetes 客户端
+// GetClient initializes and returns a Kubernetes client
 func GetClient(kubeconfig string) (*ClientSet, error) {
 	if kubeconfig == "" {
 		kubeconfig = os.Getenv("KUBECONFIG")
@@ -30,19 +30,19 @@ func GetClient(kubeconfig string) (*ClientSet, error) {
 	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
 	if err != nil {
 		log.Printf("Failed to build Kubernetes config: %v", err)
-		return nil, fmt.Errorf("构建 Kubernetes 配置失败: %v", err)
+		return nil, fmt.Errorf("Failed to build Kubernetes config: %v", err)
 	}
 
 	client, err := kubernetes.NewForConfig(config)
 	if err != nil {
 		log.Printf("Failed to create Kubernetes client: %v", err)
-		return nil, fmt.Errorf("创建 Kubernetes 客户端失败: %v", err)
+		return nil, fmt.Errorf("Failed to create Kubernetes client: %v", err)
 	}
 
 	dynClient, err := dynamic.NewForConfig(config)
 	if err != nil {
 		log.Printf("Failed to create dynamic client: %v", err)
-		return nil, fmt.Errorf("创建动态客户端失败: %v", err)
+		return nil, fmt.Errorf("Failed to create dynamic client: %v", err)
 	}
 
 	log.Printf("Dynamic client: %+v", dynClient)

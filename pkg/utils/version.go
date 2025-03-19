@@ -6,16 +6,16 @@ import (
 	"strings"
 )
 
-// Version 表示版本号
+// Version represents a version number
 type Version struct {
 	Major int
 	Minor int
 	Patch int
 }
 
-// ParseVersion 解析版本字符串（如 "2.1.3" 或 "v2.1.3"）
+// ParseVersion parses a version string (e.g., "2.1.3" or "v2.1.3")
 func ParseVersion(v string) (Version, error) {
-	v = strings.TrimPrefix(v, "v") // 移除 "v" 前缀
+	v = strings.TrimPrefix(v, "v") // Remove "v" prefix
 	parts := strings.Split(v, ".")
 	if len(parts) != 3 {
 		return Version{}, fmt.Errorf("invalid version format: %s", v)
@@ -35,7 +35,7 @@ func ParseVersion(v string) (Version, error) {
 	return Version{Major: major, Minor: minor, Patch: patch}, nil
 }
 
-// IsMinorUpgrade 判断是否为小版本升级
+// IsMinorUpgrade determines if it is a minor version upgrade
 func IsMinorUpgrade(current, target Version) bool {
 	return current.Major == target.Major
 }

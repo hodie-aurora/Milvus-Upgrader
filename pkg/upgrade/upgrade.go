@@ -7,26 +7,26 @@ import (
 	"github.com/hodie-aurora/milvus-upgrader/pkg/utils"
 )
 
-// Upgrade 执行 Milvus 升级
+// Upgrade performs a Milvus upgrade
 func Upgrade(instance, namespace, sourceVersion, targetVersion string, force, skipChecks bool, kubeconfig string) error {
 	client, err := k8s.GetClient(kubeconfig)
 	if err != nil {
-		return fmt.Errorf("获取 Kubernetes 客户端失败: %v", err)
+		return fmt.Errorf("Failed to get Kubernetes client: %v", err)
 	}
 	sourceVer, err := utils.ParseVersion(sourceVersion)
 	if err != nil {
-		return fmt.Errorf("源版本解析失败: %v", err)
+		return fmt.Errorf("Failed to parse source version: %v", err)
 	}
 	targetVer, err := utils.ParseVersion(targetVersion)
 	if err != nil {
-		return fmt.Errorf("目标版本解析失败: %v", err)
+		return fmt.Errorf("Failed to parse target version: %v", err)
 	}
-	fmt.Printf("升级 %s (%s) 从 %s 到 %s\n", instance, namespace, sourceVersion, targetVersion)
+	fmt.Printf("Upgrading %s (%s) from %s to %s\n", instance, namespace, sourceVersion, targetVersion)
 	if force {
-		fmt.Println("强制升级已启用")
+		fmt.Println("Force upgrade enabled")
 	}
 	if skipChecks {
-		fmt.Println("跳过升级前检查")
+		fmt.Println("Pre-upgrade checks skipped")
 	}
 	if utils.IsMinorUpgrade(sourceVer, targetVer) {
 		return MinorUpgrade(client, instance, namespace, targetVersion)
