@@ -11,15 +11,15 @@ import (
 func Upgrade(instance, namespace, sourceVersion, targetVersion string, force, skipChecks bool, kubeconfig string) error {
 	client, err := k8s.GetClient(kubeconfig)
 	if err != nil {
-		return fmt.Errorf("Failed to get Kubernetes client: %v", err)
+		return fmt.Errorf("failed to get Kubernetes client: %v", err)
 	}
 	sourceVer, err := utils.ParseVersion(sourceVersion)
 	if err != nil {
-		return fmt.Errorf("Failed to parse source version: %v", err)
+		return fmt.Errorf("failed to parse source version: %v", err)
 	}
 	targetVer, err := utils.ParseVersion(targetVersion)
 	if err != nil {
-		return fmt.Errorf("Failed to parse target version: %v", err)
+		return fmt.Errorf("failed to parse target version: %v", err)
 	}
 	fmt.Printf("Upgrading %s (%s) from %s to %s\n", instance, namespace, sourceVersion, targetVersion)
 	if force {

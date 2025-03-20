@@ -30,19 +30,19 @@ func GetClient(kubeconfig string) (*ClientSet, error) {
 	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
 	if err != nil {
 		log.Printf("Failed to build Kubernetes config: %v", err)
-		return nil, fmt.Errorf("Failed to build Kubernetes config: %v", err)
+		return nil, fmt.Errorf("failed to build Kubernetes config: %v", err)
 	}
 
 	client, err := kubernetes.NewForConfig(config)
 	if err != nil {
 		log.Printf("Failed to create Kubernetes client: %v", err)
-		return nil, fmt.Errorf("Failed to create Kubernetes client: %v", err)
+		return nil, fmt.Errorf("failed to create Kubernetes client: %v", err)
 	}
 
 	dynClient, err := dynamic.NewForConfig(config)
 	if err != nil {
 		log.Printf("Failed to create dynamic client: %v", err)
-		return nil, fmt.Errorf("Failed to create dynamic client: %v", err)
+		return nil, fmt.Errorf("failed to create dynamic client: %v", err)
 	}
 
 	log.Printf("Dynamic client: %+v", dynClient)

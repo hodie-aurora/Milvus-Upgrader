@@ -13,7 +13,7 @@ type Version struct {
 	Patch int
 }
 
-// ParseVersion parses a version string (e.g., "2.1.3" or "v2.1.3")
+// ParseVersion parses a version string (e.g., "2.5.3" or "v2.5.3")
 func ParseVersion(v string) (Version, error) {
 	v = strings.TrimPrefix(v, "v") // Remove "v" prefix
 	parts := strings.Split(v, ".")
