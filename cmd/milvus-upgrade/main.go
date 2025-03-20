@@ -39,15 +39,16 @@ func upgradeCmd() *cobra.Command {
 			}
 		},
 	}
+	// Define command-line flags
 	cmd.Flags().StringVarP(&instance, "instance", "i", "", "Milvus instance name (required)")
 	cmd.Flags().StringVarP(&namespace, "namespace", "n", "default", "Kubernetes namespace")
-	cmd.Flags().StringVarP(&sourceVersion, "source-version", "s", "", "Current Milvus version (required)")
+	cmd.Flags().StringVarP(&sourceVersion, "source-version", "s", "", "Current Milvus version (optional, will be auto-detected if not provided)")
 	cmd.Flags().StringVarP(&targetVersion, "target-version", "t", "", "Target Milvus version (required)")
 	cmd.Flags().BoolVarP(&force, "force", "f", false, "Force upgrade without confirmation")
 	cmd.Flags().BoolVarP(&skipChecks, "skip-checks", "k", false, "Skip pre-upgrade checks")
 	cmd.Flags().StringVar(&kubeconfig, "kubeconfig", "", "Path to kubeconfig file")
+	// Mark required flags
 	cmd.MarkFlagRequired("instance")
-	cmd.MarkFlagRequired("source-version")
 	cmd.MarkFlagRequired("target-version")
 	return cmd
 }
