@@ -47,21 +47,23 @@ func ParseVersion(v string) (Version, error) {
 	return Version{Major: major, Minor: minor, Patch: patch}, nil
 }
 
+// IsPatchUpgrade determines if it is a patch-level upgrade
+func IsPatchUpgrade(current, target Version) bool {
+	return current.Major == target.Major && current.Minor == target.Minor
+}
+
 // IsMinorUpgrade determines if it is a minor version upgrade
 func IsMinorUpgrade(current, target Version) bool {
-	return current.Major == target.Major && current.Minor == target.Minor
+	return current.Major == target.Major && current.Minor != target.Minor
 }
 
 // GetCurrentVersion gets the current Milvus version from the cluster
 func GetCurrentVersion(client *k8s.ClientSet, namespace, instance string) (string, error) {
-	// Define the GroupVersionResource for Milvus CRD
 	gvr := schema.GroupVersionResource{
 		Group:    "milvus.io",
 		Version:  "v1beta1",
 		Resource: "milvuses",
 	}
-
-	// Get the Milvus Custom Resource
 	obj, err := client.DynamicClient.Resource(gvr).Namespace(namespace).Get(context.TODO(), instance, metav1.GetOptions{})
 	if err != nil {
 		if errors.IsNotFound(err) {
@@ -69,35 +71,25 @@ func GetCurrentVersion(client *k8s.ClientSet, namespace, instance string) (strin
 		}
 		return "", fmt.Errorf("failed to get Milvus CR: %v", err)
 	}
-
-	// Extract the image field from spec.components.image
 	image, found, err := unstructured.NestedString(obj.UnstructuredContent(), "spec", "components", "image")
 	if !found || err != nil {
 		return "", fmt.Errorf("failed to get image from Milvus CR: %v", err)
 	}
-
-	// Assume image is in the form "milvusdb/milvus:2.5.3", extract the version
 	parts := strings.Split(image, ":")
 	if len(parts) != 2 {
 		return "", fmt.Errorf("invalid image format: %s", image)
 	}
 	version := parts[1]
-
-	// Trim "v" prefix if present to ensure consistency
-	version = strings.TrimPrefix(version, "v")
-
-	return version, nil
+	return strings.TrimPrefix(version, "v"), nil
 }
 
 // CheckDependencies checks if current dependency versions meet the target version requirements
 func CheckDependencies(client *k8s.ClientSet, namespace, instance, targetVersion string) error {
-	// Parse target version
 	targetVer, err := ParseVersion(targetVersion)
 	if err != nil {
 		return fmt.Errorf("failed to parse target version %s: %v", targetVersion, err)
 	}
 
-	// Define required dependency versions based on target Milvus version
 	var requiredPulsar, requiredEtcd string
 	switch {
 	case targetVer.Major == 2 && targetVer.Minor <= 4: // 2.2.x to 2.4.x
@@ -110,7 +102,6 @@ func CheckDependencies(client *k8s.ClientSet, namespace, instance, targetVersion
 		return fmt.Errorf("unsupported target version: %s", targetVersion)
 	}
 
-	// Get current Pulsar version
 	pulsarVer, err := getDependencyVersion(client, namespace, instance, "pulsar")
 	if err != nil {
 		return fmt.Errorf("failed to get Pulsar version: %v", err)
@@ -124,7 +115,6 @@ func CheckDependencies(client *k8s.ClientSet, namespace, instance, targetVersion
 		return fmt.Errorf("error: Pulsar version %s does not meet the requirement (>= %s) for target version %s; please upgrade Pulsar", pulsarVer, requiredPulsar, targetVersion)
 	}
 
-	// Get current Etcd version
 	etcdVer, err := getDependencyVersion(client, namespace, instance, "etcd")
 	if err != nil {
 		return fmt.Errorf("failed to get Etcd version: %v", err)
@@ -149,7 +139,6 @@ func getDependencyVersion(client *k8s.ClientSet, namespace, instance, depType st
 		Version:  "v1beta1",
 		Resource: "milvuses",
 	}
-
 	obj, err := client.DynamicClient.Resource(gvr).Namespace(namespace).Get(context.TODO(), instance, metav1.GetOptions{})
 	if err != nil {
 		if errors.IsNotFound(err) {
@@ -160,22 +149,16 @@ func getDependencyVersion(client *k8s.ClientSet, namespace, instance, depType st
 
 	var image string
 	var found bool
-
 	if depType == "etcd" {
-		// Etcd image is under spec.dependencies.etcd.inCluster.values.image.tag
 		path := []string{"spec", "dependencies", "etcd", "inCluster", "values", "image", "tag"}
 		image, found, err = unstructured.NestedString(obj.UnstructuredContent(), path...)
 	} else if depType == "pulsar" {
-		// Pulsar image is under spec.dependencies.pulsar.inCluster.values.images.broker.tag
 		path := []string{"spec", "dependencies", "pulsar", "inCluster", "values", "images", "broker", "tag"}
 		image, found, err = unstructured.NestedString(obj.UnstructuredContent(), path...)
 	}
-
 	if !found || err != nil {
-		return "unknown", nil // Return "unknown" if dependency version is not found
+		return "unknown", nil
 	}
-
-	// Return raw version string (e.g., "3.5.18-r1" or "3.0.7")
 	return image, nil
 }
 
@@ -184,18 +167,16 @@ func isVersionCompatible(current, required string) bool {
 	if current == "unknown" {
 		return true // Handled separately with user prompt
 	}
-
 	curVer, err := ParseVersion(current)
 	if err != nil {
 		fmt.Printf("warning: failed to parse current version %s: %v, treating as incompatible\n", current, err)
-		return false // Invalid version treated as incompatible
+		return false
 	}
 	reqVer, err := ParseVersion(required)
 	if err != nil {
 		fmt.Printf("warning: failed to parse required version %s: %v, assuming incompatible\n", required, err)
-		return false // Should not happen with predefined required versions
+		return false
 	}
-
 	return curVer.Major > reqVer.Major ||
 		(curVer.Major == reqVer.Major && curVer.Minor > reqVer.Minor) ||
 		(curVer.Major == reqVer.Major && curVer.Minor == reqVer.Minor && curVer.Patch >= reqVer.Patch)
